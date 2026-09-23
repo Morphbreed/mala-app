@@ -27,7 +27,9 @@
         pointer-events: none;
         user-select: none;
         line-height: 1.5;
+        transition: transform 0.22s ease;
       }
+      #hud.is-collapsed { transform: translateX(calc(-100% - 16px)); }
       #hud h1 {
         margin: 0 0 8px;
         font-size: 13px;
@@ -93,23 +95,36 @@
       }
       #stone-picker.is-collapsed { transform: translateX(calc(100% + 16px)); }
 
-      #stone-toggle {
+      /* Die beiden Panel-Griffe sitzen an der jeweils zur Bildmitte zeigenden
+         Kante und bleiben dadurch sichtbar, wenn ihr Panel hinausgefahren ist. */
+      #stone-toggle,
+      #hud-toggle {
         position: absolute;
         top: 12px;
-        left: -34px;
         width: 30px;
         height: 30px;
-        border-radius: 8px 0 0 8px;
         border: 1px solid rgba(255, 255, 255, 0.09);
-        border-right: none;
         background: rgba(18, 21, 26, 0.78);
         backdrop-filter: blur(8px);
         color: #c7ccd2;
         font-size: 16px;
         line-height: 1;
         cursor: pointer;
+        /* Das HUD selbst lässt Klicks durch — sein Griff darf das nicht. */
+        pointer-events: auto;
       }
-      #stone-toggle:hover { color: #fff; }
+      #stone-toggle {
+        left: -34px;
+        border-right: none;
+        border-radius: 8px 0 0 8px;
+      }
+      #hud-toggle {
+        right: -34px;
+        border-left: none;
+        border-radius: 0 8px 8px 0;
+      }
+      #stone-toggle:hover,
+      #hud-toggle:hover { color: #fff; }
 
       #stone-picker h2 {
         margin: 0;
@@ -248,7 +263,8 @@
         100% { border-color: #7fb0e8; box-shadow: 0 0 0 9px rgba(127, 176, 232, 0); }
       }
 
-      #stone-quick.is-empty-hit { animation: quick-empty-hit 260ms ease-out; }
+      #stone-quick.is-empty-hit,
+      #stone-toggle.is-empty-hit { animation: quick-empty-hit 260ms ease-out; }
 
       @keyframes quick-empty-hit {
         0%, 100% { transform: translateX(0); }
@@ -257,8 +273,19 @@
       }
       #stone-quick.is-empty-hit .quick-empty { color: #a8433f; }
 
+      /* Bei eingeklapptem Panel ist der Griff der einzige sichtbare Teil —
+         also quittiert er den Tastendruck stellvertretend für die Leiste. */
+      #stone-toggle.is-hit { animation: toggle-hit 260ms ease-out; }
+
+      @keyframes toggle-hit {
+        0% { color: #7fb0e8; box-shadow: 0 0 0 0 rgba(127, 176, 232, 0.7); }
+        100% { color: #c7ccd2; box-shadow: 0 0 0 9px rgba(127, 176, 232, 0); }
+      }
+
       @media (prefers-reduced-motion: reduce) {
         .quick-item.is-hit .quick-pick,
+        #stone-toggle.is-hit,
+        #stone-toggle.is-empty-hit,
         #stone-quick.is-empty-hit { animation-duration: 1ms; }
       }
 
@@ -299,6 +326,18 @@
       .quick-item:hover .quick-remove { opacity: 1; pointer-events: auto; }
       .quick-remove:hover { background: #a8433f; color: #fff; }
 
+      /* Steht unter der Liste, weil die Shop-Links darüber sitzen — dort, wo
+         die Frage aufkommt, wem der Shop gehört. */
+      #stone-disclaimer {
+        flex: none;
+        margin: 0;
+        padding: 9px 16px 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.09);
+        font-size: 10px;
+        line-height: 1.45;
+        color: #7c848d;
+      }
+
       .stone-swatch {
         width: 30px;
         height: 30px;
@@ -328,11 +367,12 @@
       }
 
     </style>
-    <script type="module" crossorigin src="./assets/index-CNCzFITc.js"></script>
+    <script type="module" crossorigin src="./assets/index-C2JNlAfX.js"></script>
   </head>
   <body>
     <canvas id="scene"></canvas>
     <div id="hud">
+      <button id="hud-toggle" type="button" aria-label="Anzeige schließen">&lsaquo;</button>
       <h1>Mala Designer</h1>
       <div id="counts"></div>
       <div id="hud-actions">
@@ -354,6 +394,10 @@
       <div id="stone-quick"></div>
       <input id="stone-search" type="search" placeholder="Stein suchen …" autocomplete="off" />
       <div id="stone-list" aria-label="Edelstein-Perlen"></div>
+      <p id="stone-disclaimer">
+        Steinsorten und Links folgen dem Sortiment von edelsteine-wimmer.at — einem fremden Shop,
+        mit dem dieses Projekt in keiner Verbindung steht.
+      </p>
     </aside>
   </body>
 </html>
